@@ -17,7 +17,7 @@ class PostController extends Controller
     public function index()
     {
         //get all posts from database
-        $posts = Post::latest()->get();
+        $posts = Post::latest()->paginate(1);
 
         //render with data "posts"
         return Inertia::render('Post/Index', [
@@ -58,5 +58,64 @@ class PostController extends Controller
         if($post) {
             return Redirect::route('posts.index')->with('message', 'Data Berhasil Disimpan!');
         }
+    }
+
+    /**
+     * edit
+     *
+     * @param  mixed $post
+     * @return void
+     */
+    public function edit(Post $post)
+    {
+        return Inertia::render('Post/Edit', [
+            'post' => $post
+        ]);
+    }
+
+    /**
+     * update
+     *
+     * @param  mixed $request
+     * @param  mixed $post
+     * @return void
+     */
+    public function update(Request $request, Post $post)
+    {
+        //set validation
+        $request->validate([
+            'title'   => 'required',
+            'content' => 'required',
+        ]);
+
+        //update post
+        $post->update([
+            'title'     => $request->title,
+            'content'   => $request->content
+        ]);
+
+        if($post) {
+            return Redirect::route('posts.index')->with('message', 'Data Berhasil Diupdate!');
+        }
+    }
+
+    /**
+     * destroy
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    public function destroy($id)
+    {
+        //find post by ID
+        $post = Post::findOrfail($id);
+
+        //delete post
+        $post->delete();
+
+        if($post) {
+            return Redirect::route('posts.index')->with('message', 'Data Berhasil Dihapus!');
+        }
+
     }
 }
